@@ -1,0 +1,31 @@
+# name of your project
+service: nestjs-serverless-example
+# Add-ons for the Serverless tool. serverless-offline pretends to be AWS on your own computer so you can test without deploying
+plugins:
+  - serverless-offline
+provider:
+  name: aws # means you’re using Amazon’s cloud.
+  runtime: nodejs20.x
+  # list of separate small programs
+functions:
+  api:
+    handler: dist/lambda-handler.api # Which code to run. Read it as: “open the file dist/lambda-handler.js and run the function named api inside it.”
+    timeout: 30 # Maximum run time in seconds. If it takes longer than 30 seconds, AWS cuts it off.
+    events: # What wakes this function up. Lambda functions sleep until something triggers them.
+      - http:
+          method: ANY
+          path: / # Wake up when someone visits the home address of your API (/) using any kind of request (GET, POST, etc.).
+
+  sayHello:
+    handler: dist/lambda-handler.sayHello
+    timeout: 30
+    events: # What wakes this function up. Lambda functions sleep until something triggers them.
+      - http:
+          method: ANY
+          path: /hello # Wake up when someone visits the home address of your API (/) using any kind of request (GET, POST, etc.).
+
+    # The trigger is a timer: rate(1 day) means “run once every day by itself,” like an alarm clock
+  cleanup:
+    handler: dist/lambda-handler.sayHello
+    events:
+      - schedule: rate(1 minute)
